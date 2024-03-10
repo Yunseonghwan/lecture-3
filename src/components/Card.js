@@ -1,21 +1,22 @@
-import React, { useEffect, useRef } from "react";
-
+import React, { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 function Card(props) {
-  const imgRef = useRef(null);
+  const [skip, setSkip] = useState(false);
+  const { ref, inView, entry } = useInView({
+    skip,
+    threshold: 0,
+  });
 
   useEffect(() => {
-    const options = {};
-    const callback = (entries, observer) => {
-      console.log("Entries", entries);
-    };
-    const observer = new IntersectionObserver(callback, options);
-    observer.observe(imgRef.current);
-    return () => observer.disconnect();
-  }, []);
+    if (inView) {
+      entry.target.src = entry.target.dataset.src;
+      setSkip(true);
+    }
+  }, [inView]);
 
   return (
     <div className="Card text-center">
-      <img src={props.image} ref={imgRef} />
+      <img data-src={props.image} ref={ref} />
       <div className="p-5 font-semibold text-gray-700 text-xl md:text-lg lg:text-xl keep-all">
         {props.children}
       </div>
